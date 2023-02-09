@@ -1,0 +1,40 @@
+import requests
+import xlwt
+from bs4 import BeautifulSoup
+head = {  # 模拟浏览器头部信息，向服务器发送消息
+        "User-Agent": "Mozilla / 5.0(Windows NT 10.0; Win64; x64) AppleWebKit / 537.36(KHTML, like Gecko) Chrome / 80.0.3987.122  Safari / 537.36"
+    }
+datalist=[]
+for i in range(1,20):
+    if i==1:
+        url='https://www.keyisq.com/galgame'
+    else:
+        url='https://www.keyisq.com/galgame/page/'+str(i)
+        strhtml=requests.get(url,headers=head)
+        soup=BeautifulSoup(strhtml.text,'lxml')
+        for i in soup.find_all('div',class_="post-module-thumb"):
+            data = []
+            tag=i.find('img')
+            name=tag['alt']
+            coverlink=tag['src']
+            data.append(name)
+            data.append(coverlink)
+
+            tag = i.find('a')
+            link = tag['href']
+            data.append(link)
+            datalist.append(data)
+print('save...')
+savepath = "gal.xls"
+book = xlwt.Workbook(encoding="utf-8",style_compression=0) #创建workbook对象
+sheet = book.add_sheet('可伊社区gal近况调查', cell_overwrite_ok=True) #创建工作表
+col = ("游戏名称","游戏图片链接","游戏链接")
+for i in range(0,3):
+    sheet.write(0,i,col[i])  #列名
+for i in range(0,500):
+    #print("第%d条" %(i+1))       #输出语句，用来测试
+    data = datalist[i]
+    for j in range(0,3):
+        sheet.write(i+1,j,data[j])  #数据
+    book.save(savepath) #保存
+print("爬取完毕！")
