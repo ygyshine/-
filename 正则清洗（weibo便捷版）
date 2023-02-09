@@ -1,0 +1,38 @@
+import re
+lis = []
+a=input('请输入待清洗的数据文件名称（需为在桌面路径下的utf-8编码的txt文件）：'            )
+with open(r'C:\Users\Dell\Desktop\{}.txt'.format(a),'r',encoding='utf-8') as f:
+    for line in f.readlines():
+        line = line.strip('\n')  # 去掉列表中每一个元素的换行符
+        line = line.replace("：", ":")
+        line=re.sub(r'^[^：]+:\s*','',line)#去掉冒号前的数据
+        line = re.sub(r"\[\S+\]", "", line)
+        line=re.sub(r"(回复)?(//)?\s*@\S*?\s*(:| |$)", " ", line)
+        URL_REGEX = re.compile(
+            r'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?«»“”‘’]))',
+            re.IGNORECASE)
+        line = re.sub(URL_REGEX, "", line)  # 去除网址
+        line = line.replace("转发微博", "")
+        line = re.sub(r"\s+", "", line) # 合并正文中过多的空格
+        line = line.strip('\n')
+        b = line.split(',')
+        if b !=['']:
+            lis.append(b)
+        else:
+            continue
+        #print(b)
+        #print(lis)
+    print( '优化检测，实得数据量为：',len(lis),'条')
+    #print(lis[1][0])   #测试
+    b=input('请输入清洗数据文件名称：'       )
+    with open('%s%s'%(b,'.txt'),'w',encoding='utf-8') as f2:
+        for i in range(len(lis)):
+            if i==0:
+                f2.write(str(lis[i][0])+'\n'+'\n')
+            else:
+                f2.write(str(i) + '. ' + '<'+str(lis[i][0]) +'>' + '\n' + '\n')
+                #print(type(i))
+                if i==len(lis)-1:
+                    print('清洗完成！请在路径：<C:\\Users\\Dell\\Desktop\\python练习> 中查收！')
+                else:
+                    pass
